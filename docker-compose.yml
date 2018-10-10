@@ -1,0 +1,9 @@
+version: '3'
+services:
+  fight_soft:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    volumes:
+      - ./src:/go/src/
+
