@@ -1,6 +1,7 @@
 version: '3'
 services:
-  fight_soft:
+  battle_software:
+    container_name: battle_software
     build:
       context: .
       dockerfile: docker/Dockerfile
