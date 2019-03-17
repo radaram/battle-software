@@ -15,7 +15,6 @@ import (
 	"golang.org/x/net/icmp"
 )
 
-const BUFSIZE = 1500
 const MAX_TTL = 30  // maximum ttl field value
 const NPROBES = 3   // number of trial packages
 const DPORT   = 32768 + 666  // receiver's initial port
