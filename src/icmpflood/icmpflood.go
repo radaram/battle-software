@@ -36,8 +36,6 @@ func main() {
 		log.Fatalln("dst is required param")
 	}
 
-    fmt.Println(*srcParam, *dstParam)
-
 	sd, err := syscall.Socket(syscall.AF_INET, syscall.SOCK_RAW, syscall.IPPROTO_ICMP)
 	if err != nil {
 		log.Fatalln(err)
@@ -73,12 +71,8 @@ func main() {
 		log.Fatalln("parser ip error:", *dstParam)
 	}
 
-	fmt.Println(srcAddr, dstAddr, rnd, dstAddr[0])
-   
     servAddr = ip2sockaddr(dstAddr.String())
 
-	fmt.Println(servAddr.Addr)
-	
 	pkt := createPkt(srcAddr, dstAddr, IPPROTO_ICMP)
 
 	for {
