@@ -1,19 +1,18 @@
 package main
 
 import (
-	"fmt"
 	"flag"
-	"log"
-	"net"
-	"math/rand"
-	"time"
-	"syscall"
-	"strings"
-	"strconv"
-	"golang.org/x/net/ipv4"
+	"fmt"
 	"golang.org/x/net/icmp"
+	"golang.org/x/net/ipv4"
+	"log"
+	"math/rand"
+	"net"
+	"strconv"
+	"strings"
+	"syscall"
+	"time"
 )
-
 
 func main() {
 	const on = 1
@@ -23,12 +22,12 @@ func main() {
 	var rnd bool = false
 	var randIP string
 	var servAddr syscall.SockaddrInet4
-	
+
 	srcParam := flag.String("src", "", "src addr")
 	dstParam := flag.String("dst", "", "dst addr")
 	flag.Parse()
-    
-    if len(*srcParam) == 0 {
+
+	if len(*srcParam) == 0 {
 		log.Fatalln("src is required param")
 	}
 
@@ -42,13 +41,13 @@ func main() {
 	}
 
 	err = syscall.SetsockoptInt(sd, syscall.IPPROTO_IP, syscall.IP_HDRINCL, on)
-	
+
 	if err != nil {
 		log.Fatalln(err)
 	}
 
 	err = syscall.SetsockoptInt(sd, syscall.SOL_SOCKET, syscall.SO_BROADCAST, on)
-	
+
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -62,8 +61,8 @@ func main() {
 	}
 
 	dstAddr = net.ParseIP(*dstParam)
-	
-    if srcAddr == nil {
+
+	if srcAddr == nil {
 		log.Fatalln("parser ip error:", *srcParam)
 	}
 
@@ -71,7 +70,7 @@ func main() {
 		log.Fatalln("parser ip error:", *dstParam)
 	}
 
-    servAddr = ip2sockaddr(dstAddr.String())
+	servAddr = ip2sockaddr(dstAddr.String())
 
 	pkt := createPkt(srcAddr, dstAddr, IPPROTO_ICMP)
 
@@ -81,7 +80,7 @@ func main() {
 		if err != nil {
 			log.Fatalln("Sendto() failed:", err)
 		}
-		
+
 		if rnd {
 			randIP = randomIP4()
 			srcAddr = net.ParseIP(randIP)
@@ -90,7 +89,6 @@ func main() {
 
 	}
 }
-
 
 func createPkt(srcAddr net.IP, dstAddr net.IP, protocol int) []byte {
 	/** creating package **/
@@ -113,30 +111,30 @@ func createPkt(srcAddr net.IP, dstAddr net.IP, protocol int) []byte {
 	**/
 
 	ipHdr := ipv4.Header{
-		Version: 4,
-		Len: 20,
-		TOS: 0,
+		Version:  4,
+		Len:      20,
+		TOS:      0,
 		TotalLen: 20 + 8 + 1400,
-		ID: 0,
-		FragOff: 0,
-		TTL: 255,
+		ID:       0,
+		FragOff:  0,
+		TTL:      255,
 		Protocol: protocol,
-		//Checksum: 
+		//Checksum:
 		Src: srcAddr,
 		Dst: dstAddr,
 	}
 
 	icmpBody := &icmp.Echo{
-		ID: 1,
+		ID:  1,
 		Seq: 1,
 	}
 	icmpHdr := icmp.Message{
 		Type: ipv4.ICMPTypeEcho,
 		Code: 0,
-		//Checksum: 
+		//Checksum:
 		Body: icmpBody,
 	}
- 	
+
 	ipBytes, err := ipHdr.Marshal()
 	if err != nil {
 		log.Fatalln("ip header marshal:", err)
@@ -150,7 +148,6 @@ func createPkt(srcAddr net.IP, dstAddr net.IP, protocol int) []byte {
 	return append(ipBytes, icmpBytes...)
 }
 
-
 func ip2sockaddr(ip string) syscall.SockaddrInet4 {
 	addr := [4]byte{}
 	fmt.Sscanf(ip, "%d.%d.%d.%d", &addr[0], &addr[1], &addr[2], &addr[3])
@@ -161,7 +158,6 @@ func ip2sockaddr(ip string) syscall.SockaddrInet4 {
 
 	return sockAddr
 }
-
 
 func randomIP4() string {
 	rand.Seed(time.Now().UnixNano())
